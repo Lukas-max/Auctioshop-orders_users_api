@@ -1,6 +1,6 @@
-package luke.auctioshopordersusersapi.order.model.dto;
+package luke.auctioshopordersusersapi.order.model.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import luke.auctioshopordersusersapi.order.model.dto.ProductCategory;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
@@ -62,9 +62,8 @@ public class Product implements Serializable {
     @Column(name = "date_time_updated")
     private Timestamp dateTimeUpdated;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "category_id", nullable = false)
-    @JsonIgnore
     private ProductCategory productCategory;
 
     public Product() {

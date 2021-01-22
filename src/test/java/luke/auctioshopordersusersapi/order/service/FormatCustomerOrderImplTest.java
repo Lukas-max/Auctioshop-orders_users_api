@@ -4,7 +4,7 @@ import luke.auctioshopordersusersapi.ProductRepository;
 import luke.auctioshopordersusersapi.order.model.dto.CartItemValidateDto;
 import luke.auctioshopordersusersapi.order.model.dto.CustomerDto;
 import luke.auctioshopordersusersapi.order.model.dto.CustomerOrderRequest;
-import luke.auctioshopordersusersapi.order.model.dto.Product;
+import luke.auctioshopordersusersapi.order.model.entity.Product;
 import luke.auctioshopordersusersapi.order.model.embeddable.CartItem;
 import luke.auctioshopordersusersapi.order.model.entity.Customer;
 import luke.auctioshopordersusersapi.order.model.entity.CustomerOrder;

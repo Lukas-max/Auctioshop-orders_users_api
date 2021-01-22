@@ -1,27 +1,26 @@
 package luke.auctioshopordersusersapi.order.service;
 
-import luke.auctioshopordersusersapi.order.model.dto.Product;
-import luke.auctioshopordersusersapi.ProductRepository;
 import luke.auctioshopordersusersapi.order.model.dto.CustomerOrderRequest;
+import luke.auctioshopordersusersapi.order.model.entity.Product;
+import luke.auctioshopordersusersapi.order.model.dto.ProductStock;
 import luke.auctioshopordersusersapi.order.model.embeddable.CartItem;
 import luke.auctioshopordersusersapi.order.model.entity.Customer;
 import luke.auctioshopordersusersapi.order.model.entity.CustomerOrder;
-import org.springframework.http.HttpStatus;
+import luke.auctioshopordersusersapi.user.service.ProductClient;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class FormatCustomerOrderImpl implements FormatCustomerOrder {
 
-    private final ProductRepository productRepository;
+    private final ProductClient productClient;
+    private final Set<ProductStock> productStock = new HashSet<>();
 
-    public FormatCustomerOrderImpl(ProductRepository productRepository) {
-        this.productRepository = productRepository;
+    public FormatCustomerOrderImpl(ProductClient productClient) {
+        this.productClient = productClient;
     }
 
     /**
@@ -57,7 +56,7 @@ public class FormatCustomerOrderImpl implements FormatCustomerOrder {
 
     /**
      * This first refactores the items in the cart, and decrements the database stock
-     *                                                -> refactorCartItems(List<CartItem> cartItems).
+     * -> refactorCartItems(List<CartItem> cartItems).
      * Then it creates CustomerOrder. If the cart has been refactored, the total price and quantity is recounted.
      * After these operations CustomerOrder is ready to be persisted
      */
@@ -81,9 +80,9 @@ public class FormatCustomerOrderImpl implements FormatCustomerOrder {
         boolean isRefactored = false;
 
         for (CartItem item : cartItems) {
-            Product product = getProductById(item.getProductId());
+            ProductStock productStock = getProductStock(item.getProductId());
             int quantityToBuy = item.getQuantity();
-            int inStock = product.getUnitsInStock();
+            int inStock = productStock.getUnitsInStock();
 
             if (quantityToBuy > inStock) {
                 quantityToBuy = inStock;
@@ -92,21 +91,29 @@ public class FormatCustomerOrderImpl implements FormatCustomerOrder {
                 item.setQuantity(quantityToBuy);
             }
 
-            setUnitsInStock(product, quantityToBuy);
+            recountUnitsInStock(productStock, quantityToBuy);
+            setUnitsInStock();
         }
         return isRefactored;
     }
 
     /**
-     * If we bought 5 items of a product we then decrease the items in the stock by 5.
-     * If items in stock are set to 0, we set the product inactive.
+     * If we bought 5 items of a productStock we then decrease the items in the stock by 5.
+     * If items in stock are set to 0, we set the productStock inactive.
      */
-    private void setUnitsInStock(Product product, int itemsBought){
-        product.setUnitsInStock(product.getUnitsInStock() - itemsBought);
-        if (product.getUnitsInStock() < 1)
-            product.setActive(false);
+    private void recountUnitsInStock(ProductStock productStock, int quantityToBuy) {
+        productStock.setUnitsInStock(productStock.getUnitsInStock() - quantityToBuy);
+        if (productStock.getUnitsInStock() < 1)
+            productStock.setActive(false);
 
-        productRepository.save(product);
+        this.productStock.add(productStock);
+    }
+
+    /**
+     * This method sends the final call to module ProductApi to re-write the product status in the database.
+     */
+    private void setUnitsInStock() {
+        productClient.updateProductStock(this.productStock);
     }
 
     /**
@@ -128,10 +135,14 @@ public class FormatCustomerOrderImpl implements FormatCustomerOrder {
         order.setTotalPrice(totalPrice);
     }
 
-    private Product getProductById(Long id) {
-        return productRepository
-                .findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "Nie znaleziono produktu o Id: " + id));
+    /**
+     * Fetches the Product calling the ProductApi and mapps it to ProductStock.class.
+     */
+    private ProductStock getProductStock(Long id) {
+        Product product = productClient
+                .getProductById(id)
+                .getBody();
+
+        return new ModelMapper().map(product, ProductStock.class);
     }
 }
