@@ -1,69 +1,23 @@
-package luke.auctioshopordersusersapi.order.model.entity;
+package luke.auctioshopordersusersapi.order.model.dto;
 
-import luke.auctioshopordersusersapi.order.model.dto.ProductCategory;
-import org.hibernate.annotations.Type;
-
-import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.Objects;
 
-@Entity
-@Table(name = "product")
-@NamedQueries({
-        @NamedQuery(name = "Product.saveProductWithoutImage",
-                query = "UPDATE Product p " +
-                        "SET p.sku = :sku, p.name = :name, " +
-                        "p.description = :description, " +
-                        "p.unitPrice = :unitPrice, " +
-                        "p.active = :active, " +
-                        "p.unitsInStock = :unitsInStock, " +
-                        "p.dateTimeCreated = :dateTimeCreated, " +
-                        "p.dateTimeUpdated = :dateTimeUpdated, " +
-                        "p.productCategory = :productCategory " +
-                        "WHERE p.productId = :productId")
-})
 public class Product implements Serializable {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "product_id")
     private Long productId;
-
-    @Column(name = "sku")
     private String sku;
-
-    @Column(name = "name")
     private String name;
-
-    @Lob
-    @Column(name = "description")
     private String description;
-
-    @Column(name = "unit_price")
     private BigDecimal unitPrice;
-
-    @Lob
-    @Type(type = "org.hibernate.type.ImageType")
-    @Column(name = "product_image")
     private byte[] productImage;
-
-    @Column(name = "active")
     private boolean active;
-
-    @Column(name = "units_in_stock")
     private int unitsInStock;
-
-    @Column(name = "date_time_created")
     private Timestamp dateTimeCreated;
-
-    @Column(name = "date_time_updated")
     private Timestamp dateTimeUpdated;
-
-    @ManyToOne
-    @JoinColumn(name = "category_id", nullable = false)
     private ProductCategory productCategory;
 
     public Product() {

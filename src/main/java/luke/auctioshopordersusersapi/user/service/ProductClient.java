@@ -1,6 +1,6 @@
 package luke.auctioshopordersusersapi.user.service;
 
-import luke.auctioshopordersusersapi.order.model.entity.Product;
+import luke.auctioshopordersusersapi.order.model.dto.Product;
 import luke.auctioshopordersusersapi.order.model.dto.ProductRequest;
 import luke.auctioshopordersusersapi.order.model.dto.ProductStock;
 import org.springframework.cloud.openfeign.FeignClient;

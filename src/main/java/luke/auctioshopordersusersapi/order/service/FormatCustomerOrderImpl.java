@@ -1,13 +1,14 @@
 package luke.auctioshopordersusersapi.order.service;
 
 import luke.auctioshopordersusersapi.order.model.dto.CustomerOrderRequest;
-import luke.auctioshopordersusersapi.order.model.entity.Product;
+import luke.auctioshopordersusersapi.order.model.dto.Product;
 import luke.auctioshopordersusersapi.order.model.dto.ProductStock;
 import luke.auctioshopordersusersapi.order.model.embeddable.CartItem;
 import luke.auctioshopordersusersapi.order.model.entity.Customer;
 import luke.auctioshopordersusersapi.order.model.entity.CustomerOrder;
 import luke.auctioshopordersusersapi.user.service.ProductClient;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -139,10 +140,10 @@ public class FormatCustomerOrderImpl implements FormatCustomerOrder {
      * Fetches the Product calling the ProductApi and mapps it to ProductStock.class.
      */
     private ProductStock getProductStock(Long id) {
-        Product product = productClient
-                .getProductById(id)
-                .getBody();
+        ResponseEntity<Product> responseEntity = productClient
+                .getProductById(id);
 
+        Product product = responseEntity.getBody();
         return new ModelMapper().map(product, ProductStock.class);
     }
 }

@@ -1,7 +1,5 @@
 package luke.auctioshopordersusersapi.order.model.dto;
 
-import luke.auctioshopordersusersapi.order.model.entity.Product;
-
 import java.util.Objects;
 
 public class ProductStock {
