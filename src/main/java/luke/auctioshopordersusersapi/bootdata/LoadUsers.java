@@ -18,9 +18,9 @@ public class LoadUsers implements CommandLineRunner {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
-    @Value("${Shop.admin.username}")
+    @Value("${shop.admin.username}")
     private String adminUsername;
-    @Value("${Shop.admin.password}")
+    @Value("${shop.admin.password}")
     private String adminPassword;
 
     public LoadUsers(UserRepository userRepository,
