@@ -1,19 +1,23 @@
 package luke.auctioshopordersusersapi.security.controller;
 
-import luke.auctioshopordersusersapi.security.JwtUtil;
+import luke.auctioshopordersusersapi.security.GenerateJwtUtil;
 import luke.auctioshopordersusersapi.security.model.AuthenticationRequest;
 import luke.auctioshopordersusersapi.security.model.AuthenticationResponse;
 import luke.auctioshopordersusersapi.user.model.User;
 import luke.auctioshopordersusersapi.user.service.UserServiceImpl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Set;
+import java.util.Collection;
 import java.util.stream.Collectors;
 
 @RestController
@@ -22,40 +26,56 @@ public class JwtAuthenticationController {
 
     private final UserServiceImpl userServiceImpl;
     private final AuthenticationManager authenticationManager;
-    private final JwtUtil jwtUtil;
+    private final GenerateJwtUtil generateJwtUtil;
+    private final PasswordEncoder encoder;
 
     public JwtAuthenticationController(
             UserServiceImpl userServiceImpl,
             AuthenticationManager authenticationManager,
-            JwtUtil jwtUtil) {
+            GenerateJwtUtil generateJwtUtil,
+            PasswordEncoder encoder) {
         this.userServiceImpl = userServiceImpl;
         this.authenticationManager = authenticationManager;
-        this.jwtUtil = jwtUtil;
+        this.generateJwtUtil = generateJwtUtil;
+        this.encoder = encoder;
     }
 
     @PostMapping
     public ResponseEntity<AuthenticationResponse> createAuthenticationToken(
             @RequestBody AuthenticationRequest authenticationRequest) {
 
+        User user = userServiceImpl.getUserByUsername(authenticationRequest.getUsername());
+        Collection<GrantedAuthority> authorities = getUserAuthorities(user);
+
+        if (!encoder.matches(authenticationRequest.getPassword(), user.getPassword()))
+            throw new BadCredentialsException("Hasło albo nazwa użytkownika nie prawidłowe.");
+
         UsernamePasswordAuthenticationToken token =
                 new UsernamePasswordAuthenticationToken(
                         authenticationRequest.getUsername(),
-                        authenticationRequest.getPassword()
+                        authenticationRequest.getPassword(),
+                        authorities
                 );
+
         authenticationManager.authenticate(token);
-
-        User user = userServiceImpl.getUserByUsername(authenticationRequest.getUsername());
-        final String jwtToken = jwtUtil.generateToken(user);
-
-        Set<String> roles = user.getRoles()
-                .stream()
-                .map(r -> r.getRole().toString())
-                .collect(Collectors.toSet());
+        final String jwtToken = generateJwtUtil.generateJSONToken(user, token);
 
         return ResponseEntity.ok(new AuthenticationResponse(
                 jwtToken,
                 user.getId(),
                 user.getUsername(),
-                roles));
+                authorities));
+    }
+
+    /**
+     *
+     * @param user -> User entity class. Contains id, username, password and email.
+     * @return Collection of GrantedAuthorities from Role entity ShopRole class.
+     */
+    private Collection<GrantedAuthority> getUserAuthorities(User user) {
+        return user.getRoles()
+                .stream()
+                .map(auth -> new SimpleGrantedAuthority(auth.getRole().toString()))
+                .collect(Collectors.toSet());
     }
 }

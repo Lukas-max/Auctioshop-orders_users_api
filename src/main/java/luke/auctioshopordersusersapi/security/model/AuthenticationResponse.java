@@ -1,20 +1,21 @@
 package luke.auctioshopordersusersapi.security.model;
 
-import java.util.HashSet;
-import java.util.Set;
+import org.springframework.security.core.GrantedAuthority;
+
+import java.util.Collection;
 
 
 public class AuthenticationResponse {
     private final String jwt;
     private final Long userId;
     private final String username;
-    private final Set<String> roles;
+    private final Collection<GrantedAuthority> authorities;
 
-    public AuthenticationResponse(String jwt, Long userId, String username, Set<String> roles) {
+    public AuthenticationResponse(String jwt, Long userId, String username, Collection<GrantedAuthority> authorities) {
         this.jwt = jwt;
         this.userId = userId;
         this.username = username;
-        this.roles = new HashSet<>(roles);
+        this.authorities = authorities;
     }
 
     public String getJwt() {
@@ -29,7 +30,7 @@ public class AuthenticationResponse {
         return username;
     }
 
-    public Set<String> getRoles() {
-        return roles;
+    public Collection<GrantedAuthority> getAuthorities() {
+        return authorities;
     }
 }
