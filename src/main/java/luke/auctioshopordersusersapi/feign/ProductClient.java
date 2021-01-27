@@ -1,4 +1,4 @@
-package luke.auctioshopordersusersapi.user.service;
+package luke.auctioshopordersusersapi.feign;
 
 import luke.auctioshopordersusersapi.order.model.dto.Product;
 import luke.auctioshopordersusersapi.order.model.dto.ProductRequest;

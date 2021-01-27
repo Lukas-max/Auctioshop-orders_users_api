@@ -6,7 +6,7 @@ import luke.auctioshopordersusersapi.order.model.dto.ProductStock;
 import luke.auctioshopordersusersapi.order.model.embeddable.CartItem;
 import luke.auctioshopordersusersapi.order.model.entity.Customer;
 import luke.auctioshopordersusersapi.order.model.entity.CustomerOrder;
-import luke.auctioshopordersusersapi.user.service.ProductClient;
+import luke.auctioshopordersusersapi.feign.ProductClient;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;

@@ -24,7 +24,6 @@ import java.util.stream.Collectors;
  * - subject (user username)
  * - credentials (password)
  * - authorities (admin, user authorities etc..)
- * - expiration time of the token.
  *
  * It parses the token for claims ane extracts this values as the method names say.
  */
@@ -82,12 +81,6 @@ public class JwtUtility {
         return Arrays.stream(scope)
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toSet());
-    }
-
-    public boolean isTokenExpired(String token) {
-        return extractClaim(token)
-                .getExpiration()
-                .before(new Date());
     }
 
     private Claims extractClaim(String token) {

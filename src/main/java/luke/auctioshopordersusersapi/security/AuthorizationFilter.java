@@ -66,9 +66,6 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
         if (subject == null || subject.isEmpty() || credentials == null || credentials.isEmpty() || authorities == null)
             isValid = false;
 
-        if (jwtUtility.isTokenExpired(token))
-            isValid = false;
-
         return isValid;
     }
 

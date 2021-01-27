@@ -4,7 +4,7 @@ import luke.auctioshopordersusersapi.order.model.dto.*;
 import luke.auctioshopordersusersapi.order.model.embeddable.CartItem;
 import luke.auctioshopordersusersapi.order.model.entity.Customer;
 import luke.auctioshopordersusersapi.order.model.entity.CustomerOrder;
-import luke.auctioshopordersusersapi.user.service.ProductClient;
+import luke.auctioshopordersusersapi.feign.ProductClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
