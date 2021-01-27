@@ -1,6 +1,6 @@
 package luke.auctioshopordersusersapi.security.controller;
 
-import luke.auctioshopordersusersapi.security.GenerateJwtUtil;
+import luke.auctioshopordersusersapi.security.JwtUtility;
 import luke.auctioshopordersusersapi.security.model.AuthenticationRequest;
 import luke.auctioshopordersusersapi.security.model.AuthenticationResponse;
 import luke.auctioshopordersusersapi.user.model.User;
@@ -26,17 +26,17 @@ public class JwtAuthenticationController {
 
     private final UserServiceImpl userServiceImpl;
     private final AuthenticationManager authenticationManager;
-    private final GenerateJwtUtil generateJwtUtil;
+    private final JwtUtility jwtUtility;
     private final PasswordEncoder encoder;
 
     public JwtAuthenticationController(
             UserServiceImpl userServiceImpl,
             AuthenticationManager authenticationManager,
-            GenerateJwtUtil generateJwtUtil,
+            JwtUtility jwtUtility,
             PasswordEncoder encoder) {
         this.userServiceImpl = userServiceImpl;
         this.authenticationManager = authenticationManager;
-        this.generateJwtUtil = generateJwtUtil;
+        this.jwtUtility = jwtUtility;
         this.encoder = encoder;
     }
 
@@ -58,7 +58,7 @@ public class JwtAuthenticationController {
                 );
 
         authenticationManager.authenticate(token);
-        final String jwtToken = generateJwtUtil.generateJSONToken(user, token);
+        final String jwtToken = jwtUtility.generateJSONToken(token);
 
         return ResponseEntity.ok(new AuthenticationResponse(
                 jwtToken,

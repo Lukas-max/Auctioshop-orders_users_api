@@ -168,7 +168,7 @@ class UserServiceImplTest {
 
     private Role createRole(){
         Role userRole1 = new Role();
-        userRole1.setRole(ShopRole.ROLE_USER);
+        userRole1.setRole(ShopRole.USER);
         return userRole1;
     }
 }

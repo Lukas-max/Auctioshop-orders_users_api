@@ -7,6 +7,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -26,6 +28,7 @@ public class OrderController {
      * OrderController().getAll() -> only for ROLE_ADMIN.
      */
     @GetMapping
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Page<CustomerOrder>> getAll(
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "20") int size){
@@ -36,12 +39,14 @@ public class OrderController {
     }
 
     @GetMapping("/{id}")
+    @PostAuthorize("hasAuthority('ADMIN') or returnObject.body.user.username == authentication.name")
     public ResponseEntity<CustomerOrder> getOrderByOrderId(@PathVariable Long id){
         CustomerOrder order = orderService.getOrder(id);
         return ResponseEntity.ok().body(order);
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> deleteOrderByOrderId(@PathVariable Long id){
         orderService.deleteCustomerOrderByOrderId(id);
         return ResponseEntity.ok().build();

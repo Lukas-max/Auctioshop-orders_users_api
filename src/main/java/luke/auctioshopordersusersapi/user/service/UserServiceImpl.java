@@ -38,7 +38,7 @@ public class UserServiceImpl implements UserService{
      */
     @Override
     public Page<User> getAllUsers(Pageable pageable) {
-        Page<User> users = userRepository.findAllWithoutAdmin(ShopRole.ROLE_ADMIN, pageable);
+        Page<User> users = userRepository.findAllWithoutAdmin(ShopRole.ADMIN, pageable);
         if (users.isEmpty())
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Nie ma użytkowników w bazie danych");
 

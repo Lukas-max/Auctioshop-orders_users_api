@@ -9,6 +9,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -17,6 +18,7 @@ import java.net.URI;
 
 @RestController
 @RequestMapping("/api/users")
+@PreAuthorize("hasAuthority('ADMIN')")
 public class UserController {
     private final UserService userService;
 
@@ -36,6 +38,7 @@ public class UserController {
     }
 
     @GetMapping(path = "/{id}")
+    @PreAuthorize("hasAnyAuthority('ADMIN','USER')")
     public ResponseEntity<Page<CustomerOrder>> getUserWithAllDataById(
             @PathVariable Long id,
             @RequestParam(name = "page", defaultValue = "0") int page,
