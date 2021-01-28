@@ -56,6 +56,7 @@ public class UserController {
     }
 
     @PostMapping(path = "/register")
+    @PreAuthorize("permitAll()")
     public ResponseEntity<?> addNewUser(@Valid @RequestBody UserRequest userRequest) {
         User savedUser = userService.addUser(userRequest);
 

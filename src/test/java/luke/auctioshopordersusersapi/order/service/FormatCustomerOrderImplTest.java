@@ -34,7 +34,7 @@ class FormatCustomerOrderImplTest {
 
     @BeforeEach
     public void setupMocks() {
-        MockitoAnnotations.openMocks(this);
+        MockitoAnnotations.initMocks(this);
     }
 
 
