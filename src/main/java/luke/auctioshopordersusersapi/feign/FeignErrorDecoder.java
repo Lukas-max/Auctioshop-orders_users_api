@@ -17,7 +17,7 @@ public class FeignErrorDecoder implements ErrorDecoder {
                         "Błąd autentykacji. Spróbuj zalogować się ponownie");
             case 403:
                 return new ResponseStatusException(HttpStatus.valueOf(response.status()),
-                        "Nie masz uprawnień dostępu do tych zasobów serwisu Produkty");
+                        "Nie masz uprawnień dostępu do zasobów serwisu Produkty");
             case 404:
                 return new ResponseStatusException(HttpStatus.valueOf(response.status()),
                         "Nie udało połączyć się z serwisem Produkty. Spróbuj ponownie później.");

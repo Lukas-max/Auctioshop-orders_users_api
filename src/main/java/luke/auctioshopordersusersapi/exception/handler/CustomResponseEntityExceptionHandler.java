@@ -1,6 +1,5 @@
 package luke.auctioshopordersusersapi.exception.handler;
 
-import io.jsonwebtoken.ExpiredJwtException;
 import luke.auctioshopordersusersapi.exception.OrderNotFoundException;
 import luke.auctioshopordersusersapi.exception.model.ErrorValidationResponse;
 import luke.auctioshopordersusersapi.exception.model.ExceptionMessage;
@@ -11,7 +10,6 @@ import org.springframework.expression.spel.SpelMessage;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -41,15 +39,16 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
             WebRequest request) {
 
         List<String> errors = new ArrayList<>();
-        for (FieldError error : ex.getBindingResult().getFieldErrors()){
-            errors.add(error.getDefaultMessage());
-        }
+        ex.getBindingResult().getFieldErrors().forEach(fieldError -> {
+            errors.add(fieldError.getDefaultMessage());
+        });
 
         ErrorValidationResponse response = new ErrorValidationResponse();
         response.setStatus(HttpStatus.BAD_REQUEST);
         response.setTimestamp(new Timestamp(System.currentTimeMillis()));
         response.setValidationErrors(errors);
 
+        log.warn("Handled MethodArgumentNotValidException - invalid data, sending exception message.");
         return handleExceptionInternal(ex, response, headers, response.getStatus(), request);
     }
 
@@ -66,6 +65,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
         message.setStatus(HttpStatus.NOT_FOUND.value());
         message.setMessage(ex.getMessage());
 
+        log.warn("Handled OrderNotFoundException - sending exception message.");
         return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
     }
 
@@ -77,8 +77,10 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
      */
     @ExceptionHandler(value = SpelEvaluationException.class)
     public ResponseEntity<?> handleSpelEvaluationException(SpelEvaluationException ex){
-        if (ex.getMessageCode() == SpelMessage.PROPERTY_OR_FIELD_NOT_READABLE_ON_NULL)
+        if (ex.getMessageCode() == SpelMessage.PROPERTY_OR_FIELD_NOT_READABLE_ON_NULL){
+            log.warn("Handled SpelEvaluationException - sending exception message.");
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
 
         log.error(ex.getMessage());
         return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();

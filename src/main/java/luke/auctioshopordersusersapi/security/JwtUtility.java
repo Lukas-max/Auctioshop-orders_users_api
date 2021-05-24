@@ -73,6 +73,10 @@ public class JwtUtility {
         return extractClaim(token).get("credentials", String.class);
     }
 
+    public Date getExpirationDate(String token) {
+        return extractClaim(token).getExpiration();
+    }
+
     public Set<GrantedAuthority> extractAuthorities(String token){
         String[] scope = extractClaim(token)
                 .get("authority", String.class)

@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.stream.Collectors;
 
 @RestController
@@ -59,11 +60,14 @@ public class JwtAuthenticationController {
 
         authenticationManager.authenticate(token);
         final String jwtToken = jwtUtility.generateJSONToken(token);
+        Date tokenExpiration = jwtUtility.getExpirationDate(jwtToken);
+
 
         return ResponseEntity.ok(new AuthenticationResponse(
                 jwtToken,
                 user.getId(),
                 user.getUsername(),
+                tokenExpiration,
                 authorities));
     }
 
